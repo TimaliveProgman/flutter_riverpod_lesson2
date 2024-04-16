@@ -63,7 +63,11 @@ class CounterPage extends ConsumerWidget {
         centerTitle: true,
         title: const Text("Counter"),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.refresh))
+          IconButton(
+              onPressed: () {
+                ref.invalidate(counterProvider);
+              },
+              icon: const Icon(Icons.refresh))
         ],
       ),
       body: Center(
