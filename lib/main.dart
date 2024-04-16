@@ -58,6 +58,27 @@ class CounterPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final int counter = ref.watch(counterProvider);
 
+    ref.listen<int>(counterProvider, (previous, next) {
+      if (next >= 5) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Warning'),
+              content: Text('Counter dangerously high. Consider resetting it.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                )
+              ],
+            );
+          },
+        );
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
