@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 abstract class WebsocketClient {
-  Stream<int> getCounterStream();
+  Stream<int> getCounterStream([int start]);
 }
 
 class FakeWebsocketClient implements WebsocketClient {
   @override
-  Stream<int> getCounterStream() async* {
-    int i = 0;
+  Stream<int> getCounterStream([int start = 0]) async* {
+    int i = start;
     while (true) {
       await Future.delayed(const Duration(milliseconds: 500));
       yield i++;
@@ -21,9 +21,10 @@ final websocketClientProvider = Provider<WebsocketClient>(
     return FakeWebsocketClient();
   },
 );
-final counterProvider = StreamProvider<int>((ref) {
+final counterProvider =
+    StreamProvider.family.autoDispose<int, int>((ref, start) {
   final wsClient = ref.watch(websocketClientProvider);
-  return wsClient.getCounterStream();
+  return wsClient.getCounterStream(start);
 });
 
 void main() {
@@ -79,7 +80,7 @@ class CounterPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<int> counter = ref.watch(counterProvider);
+    final AsyncValue<int> counter = ref.watch(counterProvider(5));
 
     return Scaffold(
       appBar: AppBar(
@@ -92,7 +93,7 @@ class CounterPage extends ConsumerWidget {
                 .when(
                     data: (int value) => value,
                     error: (Object e, _) => e,
-                    loading: () => 0)
+                    loading: () => 5)
                 .toString(),
             style: Theme.of(context).textTheme.displayMedium),
       ),
