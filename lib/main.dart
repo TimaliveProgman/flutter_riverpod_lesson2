@@ -87,7 +87,13 @@ class CounterPage extends ConsumerWidget {
         title: const Text("Counter"),
       ),
       body: Center(
-        child: Text(counter.toString(),
+        child: Text(
+            counter
+                .when(
+                    data: (int value) => value,
+                    error: (Object e, _) => e,
+                    loading: () => 0)
+                .toString(),
             style: Theme.of(context).textTheme.displayMedium),
       ),
     );
